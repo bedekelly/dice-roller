@@ -1,10 +1,29 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import parseDice from "./parser";
 import rollDice from "./roller";
+import "./blink.css";
+
+function Blinking() {
+  return <div className="blink">_</div>;
+}
+
+function Roll({ children: roll }: { children: string }) {
+  const [left, right] = roll.split("=");
+  return (
+    <div className="w-full flex">
+      <div className="w-1/2 text-right">{left.trim()} = </div>
+      <div className="w-1/2">&nbsp;{right.trim()}</div>
+    </div>
+  );
+}
 
 export function App() {
   const [keys, setKeys] = useState<string[]>([]);
-  const [rolls, setRolls] = useState<string[]>([]);
+  const [rolls, setRolls] = useState<string[]>([
+    "1d8 = 10",
+    "38d100 = 1000000",
+    "2d2 =1",
+  ]);
 
   const [watching, setWatching] = useState(false);
   const watchingRef = useRef(false);
@@ -69,16 +88,36 @@ export function App() {
   return (
     <main className="font-sans flex flex-col items-center content-center w-full">
       <h1 className="text-center font-bold text-5xl mt-10">
-        {watching ? "Rolling: " : "Not rolling."}
-        {diceToRoll}
+        {watching ? (
+          <>
+            {"Rolling: "}
+            {diceToRoll}
+            <Blinking />
+          </>
+        ) : (
+          <div className="mt-3">
+            Hold{" "}
+            <kbd className="border border-gray-300 rounded-lg px-3 py-1">r</kbd>{" "}
+            to roll.
+          </div>
+        )}
       </h1>
-      <ul className="flex list-none items-center flex-col text-2xl mt-10">
+      {watching && (
+        <p className="mt-8">
+          Hit{" "}
+          <kbd className="border border-gray-300 rounded-lg px-3 py-1">
+            Enter
+          </kbd>{" "}
+          to roll, or let go to cancel.
+        </p>
+      )}
+      <ul className="flex list-none items-center flex-col text-2xl mt-10 w-full">
         {rolls.map((roll, i) => (
           <li
-            className="first:text-4xl first:mb-3 first:text-white first:font-bold text-gray-200 last:text-xl"
+            className="first:mb-3 first:text-white first:font-bold text-gray-200 contents"
             key={i}
           >
-            {roll}
+            <Roll>{roll}</Roll>
           </li>
         ))}
       </ul>
