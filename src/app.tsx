@@ -1,7 +1,15 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import {
+  MutableRef,
+  StateUpdater,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "preact/hooks";
 import parseDice from "./parser";
 import rollDice from "./roller";
 import "./blink.css";
+import useRefState from "./useRefState";
 
 function Blinking() {
   return <div className="blink">_</div>;
@@ -10,35 +18,55 @@ function Blinking() {
 function Roll({ children: roll }: { children: string }) {
   const [left, right] = roll.split("=");
   return (
-    <div className="w-full flex">
+    <div className="w-full flex my-1">
       <div className="w-1/2 text-right">{left.trim()} = </div>
       <div className="w-1/2">&nbsp;{right.trim()}</div>
     </div>
   );
 }
 
+function isValidInput(input: string | null): input is string {
+  if (!input) return false;
+  if (input.includes("...")) return false;
+  return true;
+}
+
 export function App() {
   const [keys, setKeys] = useState<string[]>([]);
-  const [rolls, setRolls] = useState<string[]>([
-    "1d8 = 10",
-    "38d100 = 1000000",
-    "2d2 =1",
-  ]);
+  const [rolls, setRolls] = useState<string[]>([]);
 
-  const [watching, setWatching] = useState(false);
-  const watchingRef = useRef(false);
+  const [watchingRef, watching, setWatching] = useRefState(false);
 
   useEffect(() => {
+    // Given the current set of keys, roll the dice and update our input.
+    function getNewKeys(currentKeys: string[]) {
+      const rollInput = parseDice(currentKeys);
+      setWatching(false);
+      if (isValidInput(rollInput)) {
+        const roll = `${rollDice(rollInput)}`;
+        setRolls((oldRolls) => [
+          `${rollInput} = ${roll}`,
+          ...oldRolls.slice(0, 10),
+        ]);
+      }
+      return [];
+    }
+
     function keyDown(event: KeyboardEvent) {
       if (event.repeat) return;
 
       if (event.key === "r") {
-        watchingRef.current = true;
         setWatching(true);
         return;
       }
 
       if (!watchingRef.current) return;
+
+      if (event.key === "Escape") {
+        setKeys([]);
+        setWatching(false);
+        return;
+      }
 
       if (event.key === "Backspace") {
         setKeys((oldKeys) => oldKeys.slice(0, -1));
@@ -46,31 +74,18 @@ export function App() {
       }
 
       if (event.key === "Enter" || event.key === " ") {
-        setKeys((oldKeys) => {
-          const rollInput = parseDice(oldKeys);
-          watchingRef.current = false;
-          setWatching(false);
-          if (rollInput) {
-            const roll = `${rollDice(rollInput)}`;
-            setRolls((oldRolls) => [
-              `${rollInput} = ${roll}`,
-              ...oldRolls.slice(0, 10),
-            ]);
-          }
-          return [];
-        });
+        setKeys(getNewKeys);
+        return;
       }
-      setKeys((oldKeys) => [...oldKeys, event.key]);
+
+      if ("1234567890".includes(event.key)) {
+        setKeys((oldKeys) => [...oldKeys, event.key]);
+      }
     }
 
     function keyUp(event: KeyboardEvent) {
       if (event.key === "r") {
-        watchingRef.current = false;
-        setWatching(false);
-        setKeys((latestKeys) => {
-          console.log(latestKeys);
-          return [];
-        });
+        setKeys(getNewKeys);
       }
     }
 
@@ -104,11 +119,11 @@ export function App() {
       </h1>
       {watching && (
         <p className="mt-8">
-          Hit{" "}
-          <kbd className="border border-gray-300 rounded-lg px-3 py-1">
-            Enter
+          Let go to roll, or hit{" "}
+          <kbd className="border border-gray-300 rounded-lg px-2 py-1 mx-1">
+            Esc
           </kbd>{" "}
-          to roll, or let go to cancel.
+          to cancel.
         </p>
       )}
       <ul className="flex list-none items-center flex-col text-2xl mt-10 w-full">
