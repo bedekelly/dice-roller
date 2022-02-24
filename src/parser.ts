@@ -47,6 +47,10 @@ export default function parseDice(stringKeys: string[]): string | null {
       return `${first}d${second}`;
     }
 
+    if (second === 0) {
+      return `${first}d10`;
+    }
+
     // 21 = 2d10
     if (second === 1) {
       return `${first}d10`;
@@ -72,7 +76,7 @@ export default function parseDice(stringKeys: string[]): string | null {
       return `${asNumber(rest)}d${lastTwo}`;
     }
 
-    if (ultimate === 1) {
+    if (ultimate === 0 || ultimate === 1) {
       return `${asNumber([...rest, penultimate])}d${10}`;
     }
 

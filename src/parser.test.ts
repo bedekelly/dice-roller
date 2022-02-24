@@ -27,6 +27,14 @@ Deno.test("XdX", () => {
   assertEquals(parseDice(["3", "3"]), "33d");
 });
 
+Deno.test("XO", () => {
+  assertEquals(parseDice(["1", "0"]), "1d10");
+  assertEquals(parseDice(["2", "0"]), "1d20");
+  assertEquals(parseDice(["3", "0"]), "3d10");
+  assertEquals(parseDice(["4", "0"]), "4d10");
+  assertEquals(parseDice(["9", "0"]), "9d10");
+});
+
 Deno.test("X00", () => {
   assertEquals(parseDice(["3", "0", "0"]), "3d100");
   assertEquals(parseDice(["9", "0", "0"]), "9d100");
@@ -40,6 +48,10 @@ Deno.test("XdX0", () => {
 Deno.test("asNumber", () => {
   assertEquals(asNumber([1, 0, 0]), 100);
   assertEquals(asNumber([3, 0]), 30);
+});
+
+Deno.test("XXO", () => {
+  assertEquals(parseDice(["9", "9", "0"]), "99d10");
 });
 
 Deno.test("XXX", () => {
