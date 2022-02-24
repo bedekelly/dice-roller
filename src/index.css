@@ -24,4 +24,5 @@ body {
   width: 100%;
   background-color: #6868ac;
   color: #fff;
+  overflow: hidden;
 }

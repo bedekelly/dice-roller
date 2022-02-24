@@ -22,9 +22,9 @@ export default function parseDice(stringKeys: string[]): string | null {
   if (keys.length === 1) {
     if (allowedDice.includes(keys[0])) {
       return `1d${keys[0]}`;
-    } else if (keys[0] !== 0) {
-      return `${keys[0]}d...`;
-    } else return null;
+    }
+    if (keys[0] === 0) return "1d10";
+    return `${keys[0]}d`;
   }
 
   if (keys.length === 2) {
@@ -52,7 +52,7 @@ export default function parseDice(stringKeys: string[]): string | null {
       return `${first}d10`;
     }
 
-    return `${first}${second}d...`;
+    return `${first}${second}d`;
   }
 
   if (keys.length >= 3) {

@@ -35,7 +35,7 @@ function Roll({
 
 function isValidInput(input: string | null): input is string {
   if (!input) return false;
-  if (input.includes("...")) return false;
+  if (input.endsWith("d")) return false;
   return true;
 }
 
