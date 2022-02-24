@@ -19,5 +19,6 @@
     "jsxFragmentFactory": "Fragment"
   },
   "include": ["src"],
+  "exclude": ["src/parser.test.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
