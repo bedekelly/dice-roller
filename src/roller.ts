@@ -10,10 +10,11 @@ export default function rollDice(spec: string): [number, number[]] {
   let individuals: number[] = [];
 
   for (let d of dice) {
-    const [number, type] = d.split("d").map((val) => parseInt(val, 10));
+    let [number, type] = d.split("d").map((val) => parseInt(val, 10));
+    if (number > 99) [type, number] = [number, type];
     for (let i = 0; i < number; i++) {
       const individual = rollDie(type);
-      individuals.push(individual);
+      if (type <= 100) individuals.push(individual);
       total += individual;
     }
   }

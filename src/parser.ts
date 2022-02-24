@@ -65,6 +65,10 @@ export default function parseDice(stringKeys: string[]): string | null {
 
     if (`${penultimate}${ultimate}` === "00") {
       if (rest[rest.length - 1] === 1) {
+        const firstBit = rest.slice(0, -1);
+        if (firstBit.length == 0) {
+          return `1d100`;
+        }
         return `${asNumber(rest.slice(0, -1))}d100`;
       } else {
         return `${asNumber(rest)}d100`;
@@ -83,6 +87,7 @@ export default function parseDice(stringKeys: string[]): string | null {
     if (allowedDice.includes(ultimate)) {
       return `${asNumber([...rest, penultimate])}d${ultimate}`;
     }
+    return `${asNumber([...rest, penultimate, ultimate])}d`;
   }
 
   return null;

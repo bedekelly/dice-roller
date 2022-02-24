@@ -36,6 +36,7 @@ Deno.test("XO", () => {
 });
 
 Deno.test("X00", () => {
+  assertEquals(parseDice(["1", "0", "0"]), "1d100");
   assertEquals(parseDice(["3", "0", "0"]), "3d100");
   assertEquals(parseDice(["9", "0", "0"]), "9d100");
 });
