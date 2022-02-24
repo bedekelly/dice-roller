@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "bd": "tsc && vite build && scp -r dist/* bede.io:bede.io/dice",
     "preview": "vite preview"
   },
   "dependencies": {

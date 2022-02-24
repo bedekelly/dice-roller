@@ -15,12 +15,20 @@ function Blinking() {
   return <div className="blink">_</div>;
 }
 
-function Roll({ children: roll }: { children: string }) {
-  const [left, right] = roll.split("=");
+function Roll({
+  children: [input, output, individual],
+}: {
+  children: [string, number, number[]];
+}) {
   return (
     <div className="w-full flex my-1">
-      <div className="w-1/2 text-right">{left.trim()} = </div>
-      <div className="w-1/2">&nbsp;{right.trim()}</div>
+      <div className="w-1/2 text-right">{input.trim()} = </div>
+      <div className="w-1/2">
+        &nbsp;{output}{" "}
+        {individual.length > 1 && (
+          <span className="opacity-50 text-lg">({individual.join(" + ")})</span>
+        )}
+      </div>
     </div>
   );
 }
@@ -33,8 +41,7 @@ function isValidInput(input: string | null): input is string {
 
 export function App() {
   const [keys, setKeys] = useState<string[]>([]);
-  const [rolls, setRolls] = useState<string[]>([]);
-
+  const [rolls, setRolls] = useState<[string, number, number[]][]>([]);
   const [watchingRef, watching, setWatching] = useRefState(false);
 
   useEffect(() => {
@@ -43,9 +50,9 @@ export function App() {
       const rollInput = parseDice(currentKeys);
       setWatching(false);
       if (isValidInput(rollInput)) {
-        const roll = `${rollDice(rollInput)}`;
+        const [output, individual] = rollDice(rollInput);
         setRolls((oldRolls) => [
-          `${rollInput} = ${roll}`,
+          [rollInput, output, individual],
           ...oldRolls.slice(0, 10),
         ]);
       }
